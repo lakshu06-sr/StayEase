@@ -1,0 +1,54 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="mb-4">
+      <h1 class="h2">Add a new property</h1>
+      <p class="text-muted">Share your place with the StayEase community.</p>
+    </div>
+
+    <form method="POST" action="/newplace" class="needs-validation" novalidate>
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input id="title" type="text" name="place[title]" class="form-control" placeholder="Cozy apartment in Jaipur" required>
+        <div class="invalid-feedback">Please enter a title.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" name="place[description]" class="form-control" rows="5" placeholder="Tell guests about the property..." required></textarea>
+        <div class="invalid-feedback">Please add a description.</div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="price" class="form-label">Price per night (₹)</label>
+          <input id="price" type="number" name="place[price]" class="form-control" min="0" step="1" required>
+          <div class="invalid-feedback">Please enter a valid price.</div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="country" class="form-label">Country</label>
+          <input id="country" type="text" name="place[country]" class="form-control" placeholder="India" required>
+          <div class="invalid-feedback">Please enter a country.</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="location" class="form-label">Location</label>
+        <input id="location" type="text" name="place[location]" class="form-control" placeholder="Jaipur, Rajasthan" required>
+        <div class="invalid-feedback">Please enter a location.</div>
+      </div>
+
+      <div class="mb-4">
+        <label for="image" class="form-label">Image URL <span class="text-muted">(optional)</span></label>
+        <input id="image" type="url" name="place[image]" class="form-control" placeholder="https://...">
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="/home" class="btn btn-outline-secondary">Cancel</a>
+        <button class="btn btn-danger">Create property</button>
+      </div>
+    </form>
+  </div>
+</div>

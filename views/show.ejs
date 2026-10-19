@@ -1,0 +1,97 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <img src="<%= listing.image %>" class="img-fluid rounded-4 shadow-sm show-image" alt="<%= listing.title %>"
+         onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80'">
+  </div>
+
+  <div class="col-lg-5">
+    <div class="d-flex justify-content-between align-items-start gap-3">
+      <div>
+        <h1 class="h2 mb-2"><%= listing.title %></h1>
+        <p class="text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i><%= listing.location %>, <%= listing.country %></p>
+      </div>
+    </div>
+
+    <p class="lead fw-semibold">₹<%= listing.price.toLocaleString("en-IN") %> <span class="text-muted fs-6">/ night</span></p>
+    <p class="mb-4"><%= listing.description %></p>
+
+    <% if (listing.owner) { %>
+      <p class="small text-muted">Listed by <strong><%= listing.owner.username %></strong></p>
+    <% } %>
+
+    <% if (currentUser && listing.owner && listing.owner._id.equals(currentUser._id)) { %>
+      <div class="d-flex gap-2 mb-4">
+        <a href="/home/<%= listing._id %>/edit" class="btn btn-outline-dark">Edit</a>
+        <form method="POST" action="/home/<%= listing._id %>?_method=DELETE" onsubmit="return confirm('Delete this property?')">
+          <button class="btn btn-outline-danger">Delete</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<hr class="my-5">
+
+<section>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h3">Reviews <span class="text-muted">(<%= listing.reviews.length %>)</span></h2>
+  </div>
+
+  <% if (currentUser) { %>
+    <div class="card border-0 bg-light p-3 p-md-4 mb-4">
+      <h3 class="h5">Leave a review</h3>
+      <form method="POST" action="/home/<%= listing._id %>/reviews" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="rating" class="form-label">Rating</label>
+          <select id="rating" name="review[rating]" class="form-select" required>
+            <option value="">Choose...</option>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Great</option>
+            <option value="3">3 - Good</option>
+            <option value="2">2 - Okay</option>
+            <option value="1">1 - Poor</option>
+          </select>
+          <div class="invalid-feedback">Please choose a rating.</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="comment" class="form-label">Comment</label>
+          <textarea id="comment" name="review[comment]" class="form-control" rows="3" required></textarea>
+          <div class="invalid-feedback">Please write a comment.</div>
+        </div>
+
+        <button class="btn btn-dark">Submit review</button>
+      </form>
+    </div>
+  <% } else { %>
+    <div class="alert alert-light border">
+      <a href="/login">Log in</a> to leave a review.
+    </div>
+  <% } %>
+
+  <div class="row g-3">
+    <% if (!listing.reviews.length) { %>
+      <div class="col-12 text-muted">No reviews yet. Be the first to review this property.</div>
+    <% } %>
+
+    <% listing.reviews.forEach(review => { %>
+      <div class="col-md-6">
+        <article class="review-card h-100 p-3 border rounded-3">
+          <div class="d-flex justify-content-between">
+            <strong><%= review.author ? review.author.username : "User" %></strong>
+            <span class="text-warning"><%= "★".repeat(review.rating) %><span class="text-muted"><%= "★".repeat(5 - review.rating) %></span></span>
+          </div>
+          <p class="mb-2 mt-2"><%= review.comment %></p>
+
+          <% if (currentUser && review.author && review.author._id.equals(currentUser._id)) { %>
+            <form method="POST" action="/home/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" onsubmit="return confirm('Delete this review?')">
+              <button class="btn btn-sm btn-link text-danger p-0">Delete review</button>
+            </form>
+          <% } %>
+        </article>
+      </div>
+    <% }) %>
+  </div>
+</section>

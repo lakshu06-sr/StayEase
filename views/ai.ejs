@@ -1,0 +1,116 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="card shadow">
+                <div class="card-body p-4">
+
+                    <h2 class="text-center mb-2">
+                        🤖 StayEase AI Assistant
+                    </h2>
+
+                    <p class="text-center text-muted mb-4">
+                        Tell me what kind of stay you're looking for.
+                    </p>
+
+                    <form action="/ai-assistant" method="POST">
+
+                        <div class="mb-3">
+                            <label for="message" class="form-label">
+                                What are you looking for?
+                            </label>
+
+                            <textarea
+                                class="form-control"
+                                id="message"
+                                name="message"
+                                rows="5"
+                                placeholder="Example: I need a cheap stay in Jaipur for 3 people with a swimming pool..."
+                                required
+                            ></textarea>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-dark">
+                                Ask StayEase AI
+                            </button>
+                        </div>
+
+                    </form>
+
+                    <% if (answer) { %>
+
+                        <div class="alert alert-light border mt-4">
+                            <h5>🤖 StayEase AI</h5>
+
+                            <p class="mb-0">
+                                <%= answer %>
+                            </p>
+                        </div>
+
+                    <% } %>
+
+
+                    <% if (
+                        typeof recommendations !== "undefined" &&
+                        recommendations &&
+                        recommendations.length > 0
+                    ) { %>
+
+                        <h4 class="mt-4 mb-3">
+                            🏠 Recommended Properties
+                        </h4>
+
+                        <% recommendations.forEach((item) => { %>
+
+                            <div class="card mb-3 shadow-sm">
+
+                                <div class="card-body">
+
+                                    <h5>
+                                        <%= item.listing.title %>
+                                    </h5>
+
+                                    <p class="text-muted mb-1">
+                                        📍
+                                        <%= item.listing.location %>,
+                                        <%= item.listing.country %>
+                                    </p>
+
+                                    <p class="mb-1">
+                                        💰 ₹<%= item.listing.price %> / night
+                                    </p>
+
+                                    <p>
+                                        <%= item.listing.description %>
+                                    </p>
+
+                                    <p class="text-muted">
+                                        <strong>Why it matches:</strong>
+                                        <%= item.reason %>
+                                    </p>
+
+                                    <a
+                                        href="/home/<%= item.listing._id %>"
+                                        class="btn btn-dark"
+                                    >
+                                        View Property
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        <% }) %>
+
+                    <% } %>
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

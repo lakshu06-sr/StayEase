@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -14,6 +15,7 @@ const User = require("./models/user");
 const wrapAsync = require("./utils/wrapAsync");
 const ExpressErr = require("./utils/ExpressErr");
 const { isLoggedIn, isOwner, isReviewAuthor, validateListing, validateReview } = require("./middleware");
+const { askAI, recommendListings } = require("./ai");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -59,6 +61,95 @@ app.use((req, res, next) => {
 // Home
 app.get("/", (req, res) => {
   res.redirect("/home");
+});
+
+app.get("/ai-test", async (req, res) => {
+  try {
+    const answer = await askAI("Give me a one sentence welcome message for StayEase.");
+    res.send(answer);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("AI request failed.");
+  }
+});
+
+app.get("/ai-assistant", (req, res) => {
+  res.render("ai", { answer: null });
+});
+
+
+app.post("/ai-assistant", async (req, res) => {
+  try {
+    const message = req.body.message;
+
+    // Get listings from our StayEase database
+    const listings = await Listing.find({})
+      .select("title description price location country")
+      .lean();
+
+    // Convert listings into text for Gemini
+    const listingData = listings
+      .map((listing) => {
+        return `
+Listing ID: ${listing._id}
+Title: ${listing.title}
+Description: ${listing.description}
+Price per night: ₹${listing.price}
+Location: ${listing.location}
+Country: ${listing.country}
+`;
+      })
+      .join("\n");
+
+    const prompt = `
+You are StayEase AI, a property recommendation assistant.
+
+You MUST follow these rules:
+
+1. Recommend properties ONLY from the AVAILABLE STAYEASE LISTINGS below.
+2. Use ONLY the exact Listing IDs provided below.
+3. NEVER invent a Listing ID.
+4. NEVER invent or assume property details.
+5. NEVER add amenities, views, facilities, distances, ratings, reviews, or features unless explicitly present in the listing description.
+6. If a listing matches the user's request, return its exact Listing ID.
+7. If no listing matches, return an empty recommendations array.
+8. Keep the answer concise and friendly.
+9. Do not claim that you can book a property.
+
+USER REQUEST:
+${message}
+
+AVAILABLE STAYEASE LISTINGS:
+${listingData}
+`;
+
+    const result = await recommendListings(prompt);
+
+    // Match Gemini's IDs with actual database listings
+    const recommendations = result.recommendations
+      .map((recommendation) => {
+        const listing = listings.find(
+          (item) => item._id.toString() === recommendation.listingId
+        );
+
+        if (!listing) return null;
+
+        return {
+          listing,
+          reason: recommendation.reason
+        };
+      })
+      .filter(Boolean);
+
+    res.render("ai", {
+      answer: result.answer,
+      recommendations
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("AI request failed.");
+  }
 });
 
 app.get(

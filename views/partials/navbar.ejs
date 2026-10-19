@@ -10,19 +10,41 @@
 
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="/home">Explore</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="/home">Explore</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/ai-assistant">🤖 AI Assistant</a>
+        </li>
+
         <% if (currentUser) { %>
-          <li class="nav-item"><a class="nav-link" href="/newplace">Add Property</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="/newplace">Add Property</a>
+          </li>
         <% } %>
       </ul>
 
       <div class="d-flex align-items-center gap-2">
         <% if (currentUser) { %>
-          <span class="small text-muted d-none d-md-inline">Hi, <%= currentUser.username %></span>
-          <a class="btn btn-outline-dark btn-sm" href="/logout">Logout</a>
+          <span class="small text-muted d-none d-md-inline">
+            Hi, <%= currentUser.username %>
+          </span>
+
+          <a class="btn btn-outline-dark btn-sm" href="/logout">
+            Logout
+          </a>
+
         <% } else { %>
-          <a class="btn btn-outline-dark btn-sm" href="/login">Login</a>
-          <a class="btn btn-danger btn-sm" href="/signup">Sign up</a>
+
+          <a class="btn btn-outline-dark btn-sm" href="/login">
+            Login
+          </a>
+
+          <a class="btn btn-danger btn-sm" href="/signup">
+            Sign up
+          </a>
+
         <% } %>
       </div>
     </div>
